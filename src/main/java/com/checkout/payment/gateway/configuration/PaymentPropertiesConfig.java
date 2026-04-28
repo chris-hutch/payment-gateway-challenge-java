@@ -13,6 +13,7 @@ public class PaymentPropertiesConfig {
   public Set<String> getAllowedCurrencies() {
     return allowedCurrencies;
   }
+
   public void setAllowedCurrencies(Set<String> allowedCurrencies) {
     this.allowedCurrencies = allowedCurrencies;
   }
