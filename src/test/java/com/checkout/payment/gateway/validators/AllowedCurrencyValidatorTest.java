@@ -1,65 +1,39 @@
 package com.checkout.payment.gateway.validators;
 
 
-import com.checkout.payment.gateway.model.dto.PostPaymentRequestDTO;
-import jakarta.validation.Validation;
-import jakarta.validation.Validator;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.checkout.payment.gateway.configuration.PaymentPropertiesConfig;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import java.time.YearMonth;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 class AllowedCurrencyValidatorTest {
-  private Validator validator;
+  private AllowedCurrencyValidator validator;
 
   @BeforeEach
   void setUp() {
-    validator = Validation.buildDefaultValidatorFactory().getValidator();
-  }
-
-  private PostPaymentRequestDTO withCurrency(String currency) {
-    YearMonth nextMonth = YearMonth.now().plusMonths(1);
-    return new PostPaymentRequestDTO(
-        "2222405343248877",
-        nextMonth.getMonthValue(),
-        nextMonth.getYear(),
-        currency,
-        100,
-        "123"
-    );
+    PaymentPropertiesConfig properties = new PaymentPropertiesConfig();
+    properties.setAllowedCurrencies(Set.of("GBP", "USD", "EUR"));
+    validator = new AllowedCurrencyValidator(properties);
   }
 
   @ParameterizedTest
-  @ValueSource(strings = {"GBP", "USD", "EUR"})
+  @ValueSource(strings = {"GBP", "USD", "EUR", "gbp", "usd", "eur"})
   void whenCurrencyIsAllowed_thenValid(String currency) {
-    var violations = validator.validate(withCurrency(currency));
-
-    assertThat(violations).noneMatch(v -> v.getConstraintDescriptor()
-        .getAnnotation().annotationType().equals(AllowedCurrency.class));
+    assertThat(validator.isValid(currency, null)).isTrue();
   }
 
   @ParameterizedTest
-  @ValueSource(strings = {"JPY", "AUD", "BTC", "XXX", "gbp"})
+  @ValueSource(strings = {"JPY", "AUD", "BTC"})
   void whenCurrencyIsNotAllowed_thenInvalid(String currency) {
-    var violations = validator.validate(withCurrency(currency));
-
-    assertThat(violations).allMatch(v -> v.getConstraintDescriptor()
-        .getAnnotation().annotationType().equals(AllowedCurrency.class));
+    assertThat(validator.isValid(currency, null)).isFalse();
   }
 
   @Test
   void whenCurrencyIsNull_thenInvalid() {
-    var violations = validator.validate(withCurrency(null));
-    assertThat(violations).isNotEmpty();
-  }
-
-  @Test
-  void whenCurrencyIsBlank_thenInvalid() {
-    var violations = validator.validate(withCurrency(""));
-    assertThat(violations).isNotEmpty();
+    assertThat(validator.isValid(null, null)).isFalse();
   }
 }

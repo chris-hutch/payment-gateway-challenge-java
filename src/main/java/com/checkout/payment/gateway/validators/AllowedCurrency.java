@@ -9,7 +9,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Constraint(validatedBy = AllowedCurrencyValidator.class)
-@Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.CONSTRUCTOR})
+@Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface AllowedCurrency {
@@ -18,5 +18,4 @@ public @interface AllowedCurrency {
   Class<?>[] groups() default {};
 
   Class<? extends Payload>[] payload() default {};
-  Class<? extends Enum<?>> value();
 }

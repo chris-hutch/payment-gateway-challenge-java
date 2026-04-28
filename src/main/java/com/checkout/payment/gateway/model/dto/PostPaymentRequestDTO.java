@@ -1,6 +1,5 @@
 package com.checkout.payment.gateway.model.dto;
 
-import com.checkout.payment.gateway.model.Currency;
 import com.checkout.payment.gateway.validators.AllowedCurrency;
 import com.checkout.payment.gateway.validators.FutureExpiry;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -18,7 +17,7 @@ public record PostPaymentRequestDTO(@JsonProperty("card_number")
                                     @Min(1) @Max(12) int expiryMonth,
                                     @JsonProperty("expiry_year")
                                     int expiryYear,
-                                    @AllowedCurrency(value = Currency.class) String currency,
+                                    @AllowedCurrency String currency,
                                     @Positive int amount,
                                     @NotBlank @Pattern(regexp = "\\d{3,4}") String cvv) {
 
