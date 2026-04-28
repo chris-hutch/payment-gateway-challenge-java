@@ -1,64 +1,62 @@
 package com.checkout.payment.gateway.validators;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
+
 import com.checkout.payment.gateway.model.dto.PostPaymentRequestDTO;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validation;
-import jakarta.validation.Validator;
+import jakarta.validation.ClockProvider;
+import jakarta.validation.ConstraintValidatorContext;
+import java.time.Clock;
+import java.time.YearMonth;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import java.time.YearMonth;
-import java.util.Set;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
+@ExtendWith(MockitoExtension.class)
 class FutureExpiryValidatorTest {
 
-  private Validator validator;
+  private final FutureExpiryValidator validator = new FutureExpiryValidator();
+
+  @Mock
+  private ConstraintValidatorContext mockContext;
+
+  @Mock
+  private ClockProvider mockClockProvider;
 
   @BeforeEach
   void setUp() {
-    validator = Validation.buildDefaultValidatorFactory().getValidator();
+    when(mockContext.getClockProvider()).thenReturn(mockClockProvider);
+    when(mockClockProvider.getClock()).thenReturn(Clock.systemUTC());
   }
 
   @Test
   void whenExpiryIsNextMonth_thenValid() {
-    var violations = validator.validate(validRequest());
-    assertThat(violations).isEmpty();
+    var isValid = validator.isValid(validRequest(), mockContext);
+
+    assertThat(isValid).isTrue();
   }
 
   @Test
   void whenExpiryIsCurrentMonth_thenInvalid() {
-    var violations = validator.validate(invalidMonthRequest(0));
+    var isValid = validator.isValid(invalidMonthRequest(0), mockContext);
 
-    assertThat(violations)
-        .allMatch(v -> v.getConstraintDescriptor()
-            .getAnnotation()
-            .annotationType()
-            .equals(FutureExpiry.class)
-        );
+    assertThat(isValid).isFalse();
   }
 
   @Test
   void whenExpiryIsLastMonth_thenInvalid() {
-    var violations = validator.validate(invalidMonthRequest(-1));
+    var isValid = validator.isValid(invalidMonthRequest(-1), mockContext);
 
-    assertThat(violations)
-        .allMatch(v -> v.getConstraintDescriptor()
-            .getAnnotation()
-            .annotationType()
-            .equals(FutureExpiry.class)
-        );
+    assertThat(isValid).isFalse();
   }
 
   @Test
   void whenExpiryIsLastYear_thenInvalid() {
-    var violations = validator.validate(invalidYearRequest());
-    assertThat(violations)
-        .allMatch(v -> v.getConstraintDescriptor()
-            .getAnnotation()
-            .annotationType()
-            .equals(FutureExpiry.class)
-        );
+    var isValid = validator.isValid(invalidYearRequest(), mockContext);
+
+    assertThat(isValid).isFalse();
   }
 
   @Test
@@ -74,9 +72,9 @@ class FutureExpiryValidatorTest {
         "123"
     );
 
-    var violations = validator.validate(request);
+    var isValid = validator.isValid(request, mockContext);
 
-    assertThat(violations).isEmpty();
+    assertThat(isValid).isTrue();
   }
 
   private PostPaymentRequestDTO validRequest() {
