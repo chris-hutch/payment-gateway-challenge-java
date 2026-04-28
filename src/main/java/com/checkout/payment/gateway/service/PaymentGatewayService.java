@@ -1,10 +1,11 @@
 package com.checkout.payment.gateway.service;
 
 import com.checkout.payment.gateway.exception.EventProcessingException;
-import com.checkout.payment.gateway.model.PostPaymentRequest;
-import com.checkout.payment.gateway.model.PostPaymentResponse;
+import com.checkout.payment.gateway.model.dto.PostPaymentRequestDTO;
+import com.checkout.payment.gateway.model.dto.PaymentResponseDTO;
 import com.checkout.payment.gateway.repository.PaymentsRepository;
 import java.util.UUID;
+import com.checkout.payment.gateway.validators.FutureExpiry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -20,12 +21,12 @@ public class PaymentGatewayService {
     this.paymentsRepository = paymentsRepository;
   }
 
-  public PostPaymentResponse getPaymentById(UUID id) {
+  public PaymentResponseDTO getPaymentById(UUID id) {
     LOG.debug("Requesting access to to payment with ID {}", id);
     return paymentsRepository.get(id).orElseThrow(() -> new EventProcessingException("Invalid ID"));
   }
 
-  public UUID processPayment(PostPaymentRequest paymentRequest) {
+  public UUID processPayment(@FutureExpiry PostPaymentRequestDTO paymentRequest) {
     return UUID.randomUUID();
   }
 }
