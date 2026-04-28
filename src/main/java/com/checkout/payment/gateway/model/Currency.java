@@ -1,7 +1,7 @@
 package com.checkout.payment.gateway.model;
 
 public enum Currency {
-  GBR,
+  GBP,
   USD,
   EUR
 }

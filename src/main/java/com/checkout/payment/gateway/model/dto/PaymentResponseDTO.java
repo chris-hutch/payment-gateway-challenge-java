@@ -1,8 +1,6 @@
 package com.checkout.payment.gateway.model.dto;
 
 import com.checkout.payment.gateway.enums.PaymentStatus;
-import com.checkout.payment.gateway.model.CardNumberLastFour;
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.util.UUID;
 

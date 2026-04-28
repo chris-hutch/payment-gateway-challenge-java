@@ -1,5 +1,6 @@
 package com.checkout.payment.gateway.service;
 
+import com.checkout.payment.gateway.enums.PaymentStatus;
 import com.checkout.payment.gateway.exception.EventProcessingException;
 import com.checkout.payment.gateway.model.dto.PostPaymentRequestDTO;
 import com.checkout.payment.gateway.model.dto.PaymentResponseDTO;
@@ -26,7 +27,24 @@ public class PaymentGatewayService {
     return paymentsRepository.get(id).orElseThrow(() -> new EventProcessingException("Invalid ID"));
   }
 
-  public UUID processPayment(@FutureExpiry PostPaymentRequestDTO paymentRequest) {
-    return UUID.randomUUID();
+  public PaymentResponseDTO processPayment(PostPaymentRequestDTO paymentRequest) {
+    LOG.debug("Processing payment request ...");
+    UUID id = UUID.randomUUID();
+
+
+    // FIXME: Return dummy response until we wire in payment processor
+    PaymentResponseDTO responseDTO = new PaymentResponseDTO(
+        id,
+        PaymentStatus.AUTHORIZED,
+        paymentRequest.getLastFourCardNumberDigits(),
+        paymentRequest.expiryMonth(),
+        paymentRequest.expiryYear(),
+        paymentRequest.currency(),
+        paymentRequest.amount()
+    );
+
+    paymentsRepository.add(responseDTO);
+
+    return responseDTO;
   }
 }

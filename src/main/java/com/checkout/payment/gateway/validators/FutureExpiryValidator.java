@@ -17,7 +17,7 @@ public class FutureExpiryValidator implements ConstraintValidator<FutureExpiry, 
     Clock clock = context.getClockProvider().getClock();
     YearMonth currentYearMonth = YearMonth.now(clock);
 
-    YearMonth requestYearMonth = YearMonth.of(value.expiryMonth(), value.expiryYear());
+    YearMonth requestYearMonth = YearMonth.of(value.expiryYear(), value.expiryMonth());
     return requestYearMonth.isAfter(currentYearMonth);
   }
 }

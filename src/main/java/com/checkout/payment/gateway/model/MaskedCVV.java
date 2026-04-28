@@ -4,26 +4,27 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import org.springframework.lang.NonNull;
 import java.util.Objects;
 
-public record MaskedCVV(String cvv) {
+// FIXME: remove
+public record MaskedCVV(String value) {
 
   public MaskedCVV {
-    Objects.requireNonNull(cvv, "CVV must not be null");
-    if (!cvv.matches("\\d{3,4}")) {
+    Objects.requireNonNull(value, "CVV must not be null");
+    if (!value.matches("\\d{3,4}")) {
       throw new IllegalArgumentException("CVV must be 3-4 numeric characters");
     }
 
-    cvv = "*".repeat(cvv.length());
+    value = "*".repeat(value.length());
   }
 
   @JsonValue
-  public String cvv() {
-    return cvv;
+  public String value() {
+    return value;
   }
 
   @NonNull
   @Override
   public String toString() {
-    return "*".repeat(cvv.length());
+    return "*".repeat(value.length());
   }
 
 }
