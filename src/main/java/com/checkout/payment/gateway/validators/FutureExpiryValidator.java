@@ -5,9 +5,10 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.constraintvalidation.SupportedValidationTarget;
 import jakarta.validation.constraintvalidation.ValidationTarget;
-import org.springframework.lang.NonNull;
 import java.time.Clock;
+import java.time.DateTimeException;
 import java.time.YearMonth;
+import org.springframework.lang.NonNull;
 
 @SupportedValidationTarget(ValidationTarget.ANNOTATED_ELEMENT)
 public class FutureExpiryValidator implements ConstraintValidator<FutureExpiry, PostPaymentRequestDTO> {
@@ -15,9 +16,11 @@ public class FutureExpiryValidator implements ConstraintValidator<FutureExpiry, 
   @Override
   public boolean isValid(@NonNull PostPaymentRequestDTO value, @NonNull ConstraintValidatorContext context) {
     Clock clock = context.getClockProvider().getClock();
-    YearMonth currentYearMonth = YearMonth.now(clock);
 
-    YearMonth requestYearMonth = YearMonth.of(value.expiryYear(), value.expiryMonth());
-    return requestYearMonth.isAfter(currentYearMonth);
+    try {
+      return YearMonth.of(value.expiryYear(), value.expiryMonth()).isAfter(YearMonth.now(clock));
+    } catch (DateTimeException e) {
+      return false;
+    }
   }
 }

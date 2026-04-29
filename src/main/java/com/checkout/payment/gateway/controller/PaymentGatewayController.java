@@ -3,9 +3,9 @@ package com.checkout.payment.gateway.controller;
 import com.checkout.payment.gateway.model.dto.PaymentResponseDTO;
 import com.checkout.payment.gateway.model.dto.PostPaymentRequestDTO;
 import com.checkout.payment.gateway.service.PaymentGatewayService;
+import com.checkout.payment.gateway.validators.ValidationSequence;
 import java.net.URI;
 import java.util.UUID;
-import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +34,7 @@ public class PaymentGatewayController {
 
   @PostMapping(value = "/payments", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<PaymentResponseDTO> processPayment(
-      @Valid @RequestBody PostPaymentRequestDTO paymentRequestDTO) {
+      @Validated(ValidationSequence.class) @RequestBody PostPaymentRequestDTO paymentRequestDTO) {
     PaymentResponseDTO response = paymentGatewayService.processPayment(paymentRequestDTO);
 
     return ResponseEntity
