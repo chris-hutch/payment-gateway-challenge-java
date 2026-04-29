@@ -36,4 +36,6 @@ dependencies {
 
 tasks.named('test') {
   useJUnitPlatform()
+  // RYUK tends to be problematic on Apple Silicon so disabling for TestContainers
+  environment 'TESTCONTAINERS_RYUK_DISABLED', 'true'
 }

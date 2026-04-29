@@ -3,13 +3,12 @@ package com.checkout.payment.gateway.model;
 import com.checkout.payment.gateway.enums.PaymentStatus;
 import java.util.List;
 
-public class RejectedPaymentResponse extends RuntimeException {
+public class RejectedPaymentResponse {
 
   private final List<String> errors;
   private final PaymentStatus status;
 
   public RejectedPaymentResponse(List<String> errors) {
-    super("Payment was rejected.");
     this.status = PaymentStatus.REJECTED;
     this.errors = errors;
   }
