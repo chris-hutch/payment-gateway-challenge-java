@@ -1,8 +1,10 @@
 package com.checkout.payment.gateway.controller;
 
 
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -243,6 +245,54 @@ class PaymentGatewayControllerTest {
             .content(objectMapper.writeValueAsString(request)))
         .andExpect(status().isBadRequest())
         .andExpect(jsonPath("$.status").value(PaymentStatus.REJECTED.getName()));
+  }
+
+  @Test
+  void whenBankIsUnavailable_thenReturns502WithRequestId() throws Exception {
+    when(paymentGatewayService.processPayment(any()))
+        .thenThrow(new BankUnavailableException("Bank unavailable",
+            new RestClientException("Bank unavailable")));
+
+    mvc.perform(MockMvcRequestBuilders.post("/api/v1/payments")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(validPostRequest())))
+        .andExpect(status().isBadGateway())
+        .andExpect(header().exists("X-Request-Id"));  // requestId echoed on response
+  }
+
+  @Test
+  void whenMultipleFieldsInvalid_thenReturnsAllErrors() throws Exception {
+    PostPaymentRequestDTO request = new PostPaymentRequestDTO(
+        "1234", 13, 2020, "JPY", -1, "12"
+    );
+
+    mvc.perform(MockMvcRequestBuilders.post("/api/v1/payments")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request)))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.status").value(PaymentStatus.REJECTED.getName()))
+        .andExpect(jsonPath("$.errors").isArray())
+        .andExpect(jsonPath("$.errors.length()").value(greaterThanOrEqualTo(4)));
+  }
+
+  @Test
+  void whenRequestBodyIsMalformed_thenReturns400() throws Exception {
+    mvc.perform(MockMvcRequestBuilders.post("/api/v1/payments")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("{ not valid json"))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  void whenUnexpectedExceptionThrown_thenReturns500WithSanitisedMessage() throws Exception {
+    when(paymentGatewayService.processPayment(any()))
+        .thenThrow(new RuntimeException("internal error with secret details"));
+
+    mvc.perform(MockMvcRequestBuilders.post("/api/v1/payments")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(validPostRequest())))
+        .andExpect(status().isInternalServerError())
+        .andExpect(jsonPath("$.message").value("An unexpected error occurred"));
   }
 
   // --- helpers

@@ -86,7 +86,7 @@ public class PaymentGatewayService {
         : PaymentStatus.DECLINED;
 
     return new PaymentResponseDTO(
-        UUID.fromString(response.authorizationCode()),
+        UUID.randomUUID(),
         status,
         paymentRequest.getLastFourCardNumberDigits(),
         paymentRequest.expiryMonth(),
