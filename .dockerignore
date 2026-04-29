@@ -1,0 +1,30 @@
+# Gradle
+.gradle/
+build/
+gradlew.bat
+
+# Source control
+.git/
+.gitignore
+
+# IDE
+.idea/
+*.iws
+*.iml
+*.ipr
+.vscode/
+
+# macOS
+.DS_Store
+
+# Test resources
+src/test/
+
+# Documentation
+*.md
+docs/
+
+# Docker files themselves
+Dockerfile
+docker-compose.yml
+.dockerignore

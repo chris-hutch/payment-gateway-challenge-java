@@ -9,6 +9,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.checkout.payment.gateway.configuration.BankPropertiesConfig;
 import com.checkout.payment.gateway.exception.BankUnavailableException;
 import com.checkout.payment.gateway.model.dto.BankAuthRequestDTO;
 import com.checkout.payment.gateway.model.dto.BankAuthResponseDTO;
@@ -39,7 +40,9 @@ class RestTemplateBankClientTest {
     wireMockServer = new WireMockServer(WireMockConfiguration.wireMockConfig().dynamicPort());
     wireMockServer.start();
 
-    bankClient = new RestTemplateBankClient(restTemplate, wireMockServer.baseUrl());
+    BankPropertiesConfig bankPropertiesConfig = new BankPropertiesConfig();
+    bankPropertiesConfig.setBaseUrl(wireMockServer.baseUrl());
+    bankClient = new RestTemplateBankClient(restTemplate, bankPropertiesConfig);
   }
 
   @AfterEach

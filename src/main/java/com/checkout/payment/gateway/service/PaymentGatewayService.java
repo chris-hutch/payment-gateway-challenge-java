@@ -35,7 +35,7 @@ public class PaymentGatewayService {
   }
 
   public PaymentResponseDTO getPaymentById(UUID id) {
-    LOG.info("Requesting access to to payment with ID {}", id);
+    LOG.info("Requesting access to payment with ID {}", id);
     return paymentsRepository.get(id)
         .orElseThrow(() -> new PaymentNotFoundException("Payment not found: " + id));
   }

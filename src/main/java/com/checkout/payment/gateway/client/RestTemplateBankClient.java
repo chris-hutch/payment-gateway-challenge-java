@@ -1,12 +1,12 @@
 package com.checkout.payment.gateway.client;
 
+import com.checkout.payment.gateway.configuration.BankPropertiesConfig;
 import com.checkout.payment.gateway.exception.BankUnavailableException;
 import com.checkout.payment.gateway.model.dto.BankAuthRequestDTO;
 import com.checkout.payment.gateway.model.dto.BankAuthResponseDTO;
 import com.checkout.payment.gateway.util.CardMasker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
@@ -23,9 +23,9 @@ public class RestTemplateBankClient implements BankClient{
   private final String bankBaseUrl;
 
   public RestTemplateBankClient(RestTemplate restTemplate,
-                                @Value("${bank.base-url}") String bankBaseUrl) {
+                                BankPropertiesConfig bankPropertiesConfig) {
     this.restTemplate = restTemplate;
-    this.bankBaseUrl = bankBaseUrl;
+    this.bankBaseUrl = bankPropertiesConfig.getBaseUrl();
   }
 
   @Override

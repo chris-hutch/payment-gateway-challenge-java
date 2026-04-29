@@ -16,8 +16,6 @@ import com.checkout.payment.gateway.model.dto.PaymentResponseDTO;
 import com.checkout.payment.gateway.model.dto.PostPaymentRequestDTO;
 import com.checkout.payment.gateway.service.PaymentGatewayService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -45,10 +43,6 @@ class PaymentGatewayControllerTest {
   @MockBean
   private PaymentGatewayService paymentGatewayService;
 
-  @Autowired
-  private MeterRegistry meterRegistry;
-
-  private Counter testCounter;
 
   // --- GET api/v1/payments/{id} tests ---
 

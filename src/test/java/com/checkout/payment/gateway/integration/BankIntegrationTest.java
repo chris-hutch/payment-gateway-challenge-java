@@ -27,7 +27,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 @ActiveProfiles("test")
 public class BankIntegrationTest {
 
-  private static WireMockServer wireMockServer;
+  private WireMockServer wireMockServer;
 
   @Autowired
   private MockMvc mvc;

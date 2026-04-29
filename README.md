@@ -164,7 +164,7 @@ All log output is structured JSON via `logstash-logback-encoder`. A `RequestIdFi
 - **Currencies** are GBP, USD, EUR. The spec says "a set of at least 3". 
 - **Rejected response shape.** The spec defines `Rejected` as a payment status but doesn't specify the response shape for that outcome. I return a `RejectedPaymentResponse` with `status: "Rejected"` and a field-level `errors` list rather than a `PaymentResponseDTO` with null fields, because no payment was created, returning a payment-shaped object would be misleading.
 - **Storage** is in-memory per the spec. Payments do not survive a restart.
-- **Currency comparison** is case-insensitive. `gbp` is rejected; `GBP` is accepted.
+- **Currency comparison** is case-insensitive. `gbp` is accepted; `GBP` is accepted.
 - **Expiry validation** treats the current month as invalid. A card expiring this month may already be past its last valid transaction date depending on the day.
 - **Bank errors** (5xx, connection failure) result in a 502 with no payment persisted. The request is safe to retry.
 
