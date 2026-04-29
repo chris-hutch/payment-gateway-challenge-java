@@ -1,4 +1,4 @@
-package com.checkout.payment.gateway;
+package com.checkout.payment.gateway.integration;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
