@@ -14,6 +14,9 @@ import com.checkout.payment.gateway.model.dto.PaymentResponseDTO;
 import com.checkout.payment.gateway.model.dto.PostPaymentRequestDTO;
 import com.checkout.payment.gateway.service.PaymentGatewayService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,11 +24,13 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.client.RestClientException;
 
-@Import(PaymentPropertiesConfig.class)
+@ActiveProfiles("test")
+@Import({PaymentPropertiesConfig.class, SimpleMeterRegistry.class})
 @WebMvcTest(PaymentGatewayController.class)
 class PaymentGatewayControllerTest {
 
@@ -37,6 +42,11 @@ class PaymentGatewayControllerTest {
 
   @MockBean
   private PaymentGatewayService paymentGatewayService;
+
+  @Autowired
+  private MeterRegistry meterRegistry;
+
+  private Counter testCounter;
 
   // --- GET api/v1/payments/{id} tests ---
 

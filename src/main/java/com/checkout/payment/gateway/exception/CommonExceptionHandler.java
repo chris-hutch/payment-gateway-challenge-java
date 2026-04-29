@@ -1,7 +1,10 @@
 package com.checkout.payment.gateway.exception;
 
+import com.checkout.payment.gateway.enums.PaymentStatus;
+import com.checkout.payment.gateway.metric.GatewayMetric;
 import com.checkout.payment.gateway.model.ErrorResponse;
 import com.checkout.payment.gateway.model.RejectedPaymentResponse;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,8 +20,20 @@ public class CommonExceptionHandler {
 
   private static final Logger LOG = LoggerFactory.getLogger(CommonExceptionHandler.class);
 
+  private final MeterRegistry meterRegistry;
+
+  public CommonExceptionHandler(MeterRegistry meterRegistry) {
+    this.meterRegistry = meterRegistry;
+  }
+
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<RejectedPaymentResponse> handleException(MethodArgumentNotValidException ex) {
+    meterRegistry.counter(
+        GatewayMetric.PAYMENT_PROCESSED.getMetricName(),
+        "outcome",
+        PaymentStatus.REJECTED.getName().toLowerCase()
+    ).increment();
+
     List<String> errors = ex.getBindingResult()
         .getFieldErrors()
         .stream()

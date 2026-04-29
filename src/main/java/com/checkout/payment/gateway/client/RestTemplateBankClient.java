@@ -3,6 +3,7 @@ package com.checkout.payment.gateway.client;
 import com.checkout.payment.gateway.exception.BankUnavailableException;
 import com.checkout.payment.gateway.model.dto.BankAuthRequestDTO;
 import com.checkout.payment.gateway.model.dto.BankAuthResponseDTO;
+import com.checkout.payment.gateway.util.CardMasker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,6 +30,11 @@ public class RestTemplateBankClient implements BankClient{
 
   @Override
   public BankAuthResponseDTO authorize(BankAuthRequestDTO request) {
+    LOG.debug(
+        "Authorizing bank auth request for card={}",
+        CardMasker.maskCardNumber(request.cardNumber())
+    );
+
     try {
       ResponseEntity<BankAuthResponseDTO> response = restTemplate.postForEntity(
           bankBaseUrl + "/payments",
@@ -36,7 +42,7 @@ public class RestTemplateBankClient implements BankClient{
           BankAuthResponseDTO.class
       );
       return response.getBody();
-      
+
     } catch (HttpServerErrorException ex) {
       LOG.error("Bank returned server error: status={}", ex.getStatusCode());
       throw new BankUnavailableException("Bank unavailable " + ex.getStatusCode(), ex);
